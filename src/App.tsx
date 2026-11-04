@@ -1,10 +1,11 @@
-import './App.css'
+import EyeTracker from './eyetracker/EyeTracker';
 
 function App() {
-
   return (
-    <h1>The Mnemosyne System</h1>
-  )
+    <div>
+      <EyeTracker />
+    </div>
+  );
 }
 
-export default App
+export default App;
