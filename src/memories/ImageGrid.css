@@ -1,0 +1,59 @@
+
+.archive-grid {
+  position: relative;
+  margin: 60px auto;
+}
+
+/* Dots use absolute pixel coordinates */
+
+.dot-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.grid-dot {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #111;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Image grid */
+
+.image-layer {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  gap: 0;
+}
+
+.image-card {
+  width: 100px;
+  height: 118px;
+  display: flex;
+  flex-direction: column;
+  margin: 5px;
+}
+
+.image-label {
+  height: 18px;
+  box-sizing: border-box;
+  padding-left: 4px;
+  background: #eee;
+
+  font-size: 11px;
+
+  display: flex;
+  align-items: center;
+}
+
+.image-card img {
+  display: block;
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+}

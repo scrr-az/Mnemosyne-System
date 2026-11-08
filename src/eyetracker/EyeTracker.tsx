@@ -15,9 +15,9 @@ export default function EyeTracker() {
     const activeRef = useRef(false);
 
     const startTracking = async () => {
-        webgazer.showVideoPreview(true);
-        webgazer.showFaceOverlay(true);
-        webgazer.showFaceFeedbackBox(true);
+        webgazer.showVideoPreview(false);
+        webgazer.showFaceOverlay(false);
+        webgazer.showFaceFeedbackBox(false);
         webgazer.showPredictionPoints(true);
 
         try {
@@ -41,10 +41,7 @@ export default function EyeTracker() {
                 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh';
 
             await webgazer.begin();
-            console.log("WebGazer ready:", webgazer.isReady());
-            console.log("Tracker:", webgazer.getTracker());
-            console.log("Regression:", webgazer.getRegression());
-
+            
             activeRef.current = true;
             setIsTracking(true);
         } catch (error) {
@@ -76,7 +73,6 @@ export default function EyeTracker() {
 
     return (
         <div>
-        <h1>Eye Tracking Demo</h1>
 
         <button
             onClick={isTracking ? stopTracking : startTracking}
