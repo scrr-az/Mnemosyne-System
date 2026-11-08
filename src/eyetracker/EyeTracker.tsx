@@ -1,111 +1,154 @@
 
-import { useEffect, useRef, useState } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+
 const webgazer = window.webgazer;
+
 
 interface GazePosition {
   x: number;
   y: number;
 }
 
-export default function EyeTracker() {
-    const [isTracking, setIsTracking] = useState(false);
-    const [gaze, setGaze] = useState<GazePosition | null>(null);
+interface EyeTrackingContextType {
+  gaze: GazePosition | null;
+  isTracking: boolean;
+  restartTracking: () => Promise<void>;
+  stopTracking: () => void;
+}
 
-    const dotRef = useRef<HTMLDivElement>(null);
-    const activeRef = useRef(false);
+const EyeTrackingContext =
+  createContext<EyeTrackingContextType | null>(null);
 
-    const startTracking = async () => {
-        webgazer.showVideoPreview(false);
-        webgazer.showFaceOverlay(false);
-        webgazer.showFaceFeedbackBox(false);
-        webgazer.showPredictionPoints(true);
+export function EyeTrackingProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  const [gaze, setGaze] = useState<GazePosition | null>(null);
+  const [isTracking, setIsTracking] = useState(false);
 
-        try {
-            webgazer.setGazeListener((data) => {
-                if (!data) {
-                    console.log("No gaze prediction");
-                    return;
-                }
+  const startedRef = useRef(false);
+  const startingRef = useRef(false);
 
-                console.log("Gaze position:", data.x, data.y);
+  const startTracking = async () => {
+    if (startingRef.current) return;
 
-                if (dotRef.current) {
-                    dotRef.current.style.left = `${data.x}px`;
-                    dotRef.current.style.top = `${data.y}px`;
-                }
+    startingRef.current = true;
 
-                setGaze({ x: data.x, y: data.y });
-            });
+    try {
+      webgazer.showVideoPreview(false);
+      webgazer.showFaceOverlay(false);
+      webgazer.showFaceFeedbackBox(false);
+      webgazer.showPredictionPoints(true);
 
-            webgazer.params.faceMeshSolutionPath =
-                'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh';
+      webgazer.params.faceMeshSolutionPath =
+        "https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh";
 
-            await webgazer.begin();
-            
-            activeRef.current = true;
-            setIsTracking(true);
-        } catch (error) {
-            console.error("Full error:", error);
+      webgazer.setGazeListener((data) => {
+        if (!data) return;
 
-            if (error instanceof Error) {
-                console.error("Stack trace:", error.stack);
-            }
-        }
-    };
+        setGaze({
+          x: data.x,
+          y: data.y,
+        });
+      });
 
-    const stopTracking = () => {
+      if (startedRef.current) {
+        await webgazer.end();
+        startedRef.current = false;
+      }
+
+      await webgazer.begin();
+
+      startedRef.current = true;
+      setIsTracking(true);
+    } catch (error) {
+      console.error("WebGazer error:", error);
+      setIsTracking(false);
+    } finally {
+      startingRef.current = false;
+    }
+  };
+
+  const stopTracking = () => {
+    if (!startedRef.current) return;
+
+    webgazer.end();
+    webgazer.clearGazeListener();
+
+    startedRef.current = false;
+    setIsTracking(false);
+    setGaze(null);
+  };
+
+  const restartTracking = async () => {
+    if (startingRef.current) return;
+
+    if (startedRef.current) {
+      await webgazer.end();
+      startedRef.current = false;
+      setIsTracking(false);
+    }
+
+    await startTracking();
+  };
+
+  useEffect(() => {
+    startTracking();
+
+    return () => {
+      if (startedRef.current) {
         webgazer.end();
         webgazer.clearGazeListener();
-
-        activeRef.current = false;
-        setIsTracking(false);
-        setGaze(null);
+        startedRef.current = false;
+      }
     };
+  }, []);
 
-    useEffect(() => {
-        return () => {
-        if (activeRef.current) {
-            webgazer.end();
-            webgazer.clearGazeListener();
-        }
-        };
-    }, []);
+  return (
+    <EyeTrackingContext.Provider
+      value={{
+        gaze,
+        isTracking,
+        restartTracking,
+        stopTracking,
+      }}
+    >
+      {children}
 
-    return (
-        <div>
+      <div
+        style={{
+          position: "fixed",
+          left: gaze?.x ?? -100,
+          top: gaze?.y ?? -100,
+          width: 18,
+          height: 18,
+          backgroundColor: "red",
+          borderRadius: "50%",
+          transform: "translate(-50%, -50%)",
+          pointerEvents: "none",
+          zIndex: 99999,
+        }}
+      />
+    </EyeTrackingContext.Provider>
+  );
+}
 
-        <button
-            onClick={isTracking ? stopTracking : startTracking}
-        >
-            {isTracking ? 'Stop Tracking' : 'Start Tracking'}
-        </button>
+export function useEyeTracking() {
+  const context = useContext(EyeTrackingContext);
 
-        {isTracking && (
-            <p>Eye tracking is active!</p>
-        )}
-
-        {gaze && (
-            <p>
-            X: {gaze.x.toFixed(0)} |
-            Y: {gaze.y.toFixed(0)}
-            </p>
-        )}
-
-        <div
-            ref={dotRef}
-            style={{
-            position: 'fixed',
-            left: -100,
-            top: -100,
-            width: '18px',
-            height: '18px',
-            backgroundColor: 'red',
-            borderRadius: '50%',
-            transform: 'translate(-50%, -50%)',
-            pointerEvents: 'none',
-            zIndex: 99999,
-            }}
-        />
-        </div>
+  if (!context) {
+    throw new Error(
+      "useEyeTracking must be used inside EyeTrackingProvider"
     );
+  }
+
+  return context;
 }
