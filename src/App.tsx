@@ -1,12 +1,17 @@
 import EyeTracker from './eyetracker/EyeTracker';
 import ImageGrid from './memories/ImageGrid';
+import Header from './Header';
+import './App.css';
 
 function App() {
   return (
-    <div>
-      <EyeTracker />
-      <ImageGrid/>
-    </div>
+    <>
+    <Header />
+      <div>
+        <EyeTracker />
+        <ImageGrid/>
+      </div>
+    </>
   );
 }
 
