@@ -1,0 +1,44 @@
+.memory-grid {
+  position: relative;
+  margin: 30px auto;
+}
+
+.memory-layer {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  gap: 0;
+}
+
+.memory-card {
+  width: 340px;
+  height: 236px;
+  display: flex;
+  flex-direction: column;
+  margin: 5px;
+}
+
+.memory-label {
+  height: 36px;
+  box-sizing: border-box;
+  padding-left: 4px;
+  background: #eee;
+
+  font-size: 11px;
+
+  display: flex;
+  align-items: center;
+
+  outline-style: solid;
+  outline-width: 1px;
+}
+
+.memory-card img {
+  display: block;
+  width: 340px;
+  height: 200px;
+  object-fit: cover;
+
+  outline-style: solid;
+  outline-width: 1px;
+}
