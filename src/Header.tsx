@@ -2,7 +2,6 @@ import './Header.css'
 
 export default function Header(){
     const handleClick = (event) => {
-        event.preventDefault();
         console.log("called")
     }
 
@@ -10,7 +9,7 @@ export default function Header(){
         <header>
             <p>User 2084</p>
             <h1 className='website-name'>Mnemosyne system</h1>
-            <a onClick={handleClick} href='.'>History</a>
+            <p onClick={handleClick} style={{cursor: 'pointer'}}>History</p>
         </header>
     )
 }

@@ -57,63 +57,61 @@ export default function ImageGrid() {
     []
   );
 
-  const rows = Math.max(...positions.map(p => p.row));
-
-    const dots = Array.from(
-    { length: (COLUMNS + 1) * (rows + 1) },
+  const dots = Array.from(
+    { length: (COLUMNS + 1) * (ROWS + 1) },
     (_, i) => ({
-        id: i,
-        x: (i % (COLUMNS + 1)) * CELL_WIDTH,
-        y: Math.floor(i / (COLUMNS + 1)) * CELL_HEIGHT,
+      id: i,
+      x: (i % (COLUMNS + 1)) * CELL_WIDTH,
+      y: Math.floor(i / (COLUMNS + 1)) * CELL_HEIGHT,
     })
-    );
+  );
 
-    return (
+  return (
     <div
-        className="archive-grid"
-        style={{
+      className="image-grid"
+      style={{
         width: COLUMNS * CELL_WIDTH,
-        height: rows * CELL_HEIGHT,
-        }}
+        height: ROWS * CELL_HEIGHT,
+      }}
     >
-        {/* Dots */}
-        <div className="dot-layer">
-        {dots.map(dot => (
-            <span
-            key={dot.id}
-            className="grid-dot"
-            style={{
-                left: dot.x,
-                top: dot.y,
-            }}
-            />
-        ))}
-        </div>
+      {/* Dots */}
+      <div className="dot-layer">
+      {dots.map(dot => (
+        <span
+          key={dot.id}
+          className="grid-dot"
+          style={{
+            left: dot.x,
+            top: dot.y,
+          }}
+        />
+      ))}
+      </div>
 
-        {/* Images */}
-        <div
+      {/* Images */}
+      <div
         className="image-layer"
         style={{
-            gridTemplateColumns: `repeat(${COLUMNS}, ${CELL_WIDTH}px)`,
-            gridTemplateRows: `repeat(${rows}, ${CELL_HEIGHT}px)`,
+          gridTemplateColumns: `repeat(${COLUMNS}, ${CELL_WIDTH}px)`,
+          gridTemplateRows: `repeat(${ROWS}, ${CELL_HEIGHT}px)`,
         }}
-        >
+      >
         {positions.map(image => (
-            <div
+          <div
             key={image.id}
             className="image-card"
             style={{
-                gridColumn: image.column,
-                gridRow: image.row,
+              gridColumn: image.column,
+              gridRow: image.row,
             }}
-            >
+          >
             <div className="image-label">
-                IMG-{String(image.id).padStart(3, "0")}
+              IMG-{String(image.id).padStart(3, "0")}
             </div>
             <img src={image.src} alt={image.alt} />
             </div>
         ))}
-        </div>
+      </div>
     </div>
-    );
+  );
 }
