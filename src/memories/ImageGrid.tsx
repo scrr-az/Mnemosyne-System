@@ -20,7 +20,7 @@ const images: ImageItem[] = [
 ];
 
 const COLUMNS = 8;
-const ROWS = 5;
+const ROWS = 6;
 const CELL_WIDTH = 100 + 10;
 const IMAGE_SIZE = 100;
 const LABEL_HEIGHT = 18;

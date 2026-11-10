@@ -16,6 +16,8 @@
   display: flex;
   flex-direction: column;
   margin: 5px;
+
+  cursor: pointer;
 }
 
 .memory-label {

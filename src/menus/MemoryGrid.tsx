@@ -118,8 +118,7 @@ export default function MemoryGrid({ onMemoryClick }: MemoryGridProps){
               position: "absolute",
               left: image.x,
               top: image.y,
-              zIndex: image.zIndex,
-              cursor: 'pointer'
+              zIndex: image.zIndex
             }}
             onClick={() => onMemoryClick(image.type)}
           >

@@ -1,9 +1,10 @@
 import { EyeTrackingProvider } from './eyetracker/EyeTracker';
 import ImageGrid from './memories/ImageGrid';
-import Header from './Header';
-import MemoryGrid from './MemoryGrid';
+import Header from './common/Header';
+import MemoryGrid from './menus/MemoryGrid';
 import './App.css';
 import { useState } from 'react';
+import Overlay from './common/Overlay';
 
 function App() {
 
@@ -27,8 +28,8 @@ function App() {
 
   return (
     <EyeTrackingProvider>
-      <Header />
-      
+      <Header onHistoryClick={setSelectedMemory} />
+      <Overlay onBackClick={setSelectedMemory} selectedMemory={selectedMemory}/>
       {content}
   
     </EyeTrackingProvider>
