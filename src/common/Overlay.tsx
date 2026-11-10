@@ -1,14 +1,14 @@
 import './Overlay.css'
 
 interface OverlayProps {
-  onBackClick: (type: string) => void;
-  selectedMemory: string;
+  onBackClick: (type: number) => void;
+  selectedMemory: number;
 }
 
 export default function Overlay({ onBackClick, selectedMemory } : OverlayProps){
     return (
     <div className="overlay">
-        { selectedMemory === "none" ? null : <p className="back-button" onClick={() => onBackClick("none")}>Back</p> }
-        {selectedMemory === "none" ? null : <p className='report-button'>Report an anomaly</p>}
+        { selectedMemory < 0 ? null : <p className="back-button" onClick={() => onBackClick(-1)}>Back</p> }
+        { selectedMemory < 0 ? null : <p className='report-button'>Report an anomaly</p>}
     </div>)
 }

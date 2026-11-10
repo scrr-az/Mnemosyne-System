@@ -7,16 +7,22 @@
   right: 0;
   bottom: 0;
   z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+
+  pointer-events: none;
 }
 
 .back-button {
   margin-top: 130px;
   margin-left: 100px;
   cursor: pointer;
+
+  pointer-events: auto;
 }
 .report-button {
   position: absolute;
   right: 100px;
   bottom: 50px;
   cursor: pointer;
+
+  pointer-events: auto;
 }

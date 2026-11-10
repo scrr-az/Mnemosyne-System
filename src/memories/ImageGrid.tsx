@@ -1,9 +1,10 @@
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import "./ImageGrid.css";
 
 interface ImageGridProps {
   isActive: boolean;
+  memoryIdx: number;
 }
 
 type ImageItem = {
@@ -13,15 +14,31 @@ type ImageItem = {
   variations?: string[];
 };
 
-const images: ImageItem[] = [
-  { id: 1, src: "src/assets/1.png", alt: "Image 1", variations: ["src/assets/1-variation1.png", "src/assets/1-variation2.png", "src/assets/1-variation3.png"] },
-  { id: 2, src: "src/assets/2.png", alt: "Image 2" },
-  { id: 3, src: "src/assets/3.png", alt: "Image 3" },
-  { id: 4, src: "src/assets/4.png", alt: "Image 4" },
-  { id: 5, src: "src/assets/5.png", alt: "Image 5" },
-  { id: 6, src: "src/assets/6.png", alt: "Image 6" },
-  { id: 7, src: "src/assets/7.png", alt: "Image 7" },
-  { id: 8, src: "src/assets/8.png", alt: "Image 8" },
+const images_graduation: ImageItem[] = [
+  { id: 1, src: "src/assets/graduation/1.png", alt: "Image 1", variations: ["src/assets/graduation/1-variation1.png", "src/assets/graduation/1-variation2.png", "src/assets/graduation/1-variation3.png"] },
+  { id: 2, src: "src/assets/graduation/2.png", alt: "Image 2" },
+  { id: 3, src: "src/assets/graduation/3.png", alt: "Image 3" },
+  { id: 4, src: "src/assets/graduation/4.png", alt: "Image 4" },
+  { id: 5, src: "src/assets/graduation/5.png", alt: "Image 5" },
+  { id: 6, src: "src/assets/graduation/6.png", alt: "Image 6" },
+  { id: 7, src: "src/assets/graduation/7.png", alt: "Image 7" },
+  { id: 8, src: "src/assets/graduation/8.png", alt: "Image 8" },
+];
+
+const images_love: ImageItem[] = [
+  { id: 2, src: "src/assets/love/1.png", alt: "Image 2", variations: ["src/assets/love/1-variation1.png", "src/assets/graduation/1-variation2.png", "src/assets/graduation/1-variation3.png"] },
+  { id: 1, src: "src/assets/love/2.png", alt: "Image 1" },
+  { id: 3, src: "src/assets/love/3.png", alt: "Image 3" },
+  { id: 4, src: "src/assets/love/4.png", alt: "Image 4" },
+  { id: 5, src: "src/assets/love/5.png", alt: "Image 5" },
+  { id: 6, src: "src/assets/love/6.png", alt: "Image 6" },
+  { id: 7, src: "src/assets/love/7.png", alt: "Image 7" },
+  { id: 8, src: "src/assets/love/8.png", alt: "Image 8" },
+];
+
+const memories: ImageItem[][] = [
+  images_graduation,
+  images_love
 ];
 
 const COLUMNS = 8;
@@ -31,8 +48,8 @@ const IMAGE_SIZE = 100;
 const LABEL_HEIGHT = 18;
 const CELL_HEIGHT = IMAGE_SIZE + LABEL_HEIGHT + 10;
 
-function generatePositions(items: ImageItem[]) {
-  let seed = 2603;
+function generatePositions(items: ImageItem[], initialSeed: number) {
+  let seed = initialSeed;
 
   const random = () => {
     seed = (seed * 16807) % 2147483647;
@@ -56,17 +73,29 @@ function generatePositions(items: ImageItem[]) {
   });
 }
 
-export default function ImageGrid({ isActive } : ImageGridProps) {
-  const [displayedSources, setDisplayedSources] = useState<Record<number, string>>({});
+type PositionedImage = ImageItem & {
+  column: number;
+  row: number;
+};
 
+// generate positions of the images of each memory
+const memoryPositions: PositionedImage[][] = memories.map(
+  (memory, index) => generatePositions(memory, 2603 + index * 2000)
+);
+
+export default function ImageGrid({ isActive, memoryIdx } : ImageGridProps) {
+  const [displayedSources, setDisplayedSources] = useState<Record<string, string>>({});
+
+  // Function to change the images
   useEffect(() => {
 
+    // If it is not showing this memory, do not change images
     if (!isActive) return;
 
     const interval = setInterval(() => {
       setDisplayedSources((previous) => {
         // Only images that have variations
-        const candidates = images.filter(
+        const candidates = memories[memoryIdx].filter(
           (image) => image.variations && image.variations.length > 0
         );
 
@@ -80,29 +109,25 @@ export default function ImageGrid({ isActive } : ImageGridProps) {
         const options = [selected.src, ...selected.variations!];
 
         // Current version
-        const current = previous[selected.id] ?? selected.src;
+        const sourceKey = `${memoryIdx}-${selected.id}`;
+        const current = previous[sourceKey] ?? selected.src;
 
         // Avoid selecting the same version
         const available = options.filter((src) => src !== current);
 
-        const next =
-          available[Math.floor(Math.random() * available.length)];
+        const next = available[Math.floor(Math.random() * available.length)];
 
         return {
           ...previous,
-          [selected.id]: next,
+          [sourceKey]: next,
         };
       });
-    }, 3000); // Every 3 seconds
+    }, 10000); // Every 10 seconds
 
     return () => clearInterval(interval);
-  }, [isActive]);
+  }, [isActive, memoryIdx]);
 
-  // generate positions of the images
-  const positions = useMemo(
-    () => generatePositions(images),
-    []
-  );
+  const positions = memoryPositions[memoryIdx] ?? [];
 
   const dots = Array.from(
     { length: (COLUMNS + 1) * (ROWS + 1) },
@@ -143,21 +168,29 @@ export default function ImageGrid({ isActive } : ImageGridProps) {
           gridTemplateRows: `repeat(${ROWS}, ${CELL_HEIGHT}px)`,
         }}
       >
-        {positions.map(image => (
-          <div
-            key={image.id}
-            className="image-card"
-            style={{
-              gridColumn: image.column,
-              gridRow: image.row,
-            }}
-          >
-            <div className="image-label">
-              IMG-{String(image.id).padStart(3, "0")}
+        {positions.map(image => {
+          const sourceKey = `${memoryIdx}-${image.id}`;
+
+          return (
+            <div
+              key={image.id}
+              className="image-card"
+              style={{
+                gridColumn: image.column,
+                gridRow: image.row,
+              }}
+            >
+              <div className="image-label">
+                IMG-{String(image.id).padStart(3, "0")}
+              </div>
+
+              <img
+                src={displayedSources[sourceKey] ?? image.src}
+                alt={image.alt}
+              />
             </div>
-            <img src={displayedSources[image.id] ?? image.src}  alt={image.alt} />
-            </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

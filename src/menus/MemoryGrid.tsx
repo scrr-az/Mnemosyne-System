@@ -2,26 +2,26 @@ import { useMemo } from "react";
 import './MemoryGrid.css';
 
 interface MemoryGridProps {
-  onMemoryClick: (type: string) => void;
+  onMemoryClick: (type: number) => void;
 }
 
 type MemoryItem = {
   id: number;
   src: string;
   alt: string;
-  type: string;
+  index: number;
 };
 
 const memories : MemoryItem[] = [
-  { id: 1, src: "src/assets/mindefault.png", alt: "Memory 3", type: "none" },
-  { id: 2, src: "src/assets/mindefault.png", alt: "Memory 3", type: "none" },
-  { id: 3, src: "src/assets/mindefault.png", alt: "Memory 3", type: "none" },
-  { id: 4, src: "src/assets/mindefault.png", alt: "Memory 3", type: "none" },
-  { id: 5, src: "src/assets/mindefault.png", alt: "Memory 3", type: "none" },
-  { id: 6, src: "src/assets/mindefault.png", alt: "Memory 3", type: "none" },
-  { id: 7, src: "src/assets/mindefault.png", alt: "Memory 3", type: "none" },
-  { id: 8, src: "src/assets/min1.png", alt: "Memory 1", type: "image" },
-  { id: 9, src: "src/assets/min2.png", alt: "Memory 2", type: "image" },
+  { id: 1, src: "src/assets/mindefault.png", alt: "Memory 3", index: -1 },
+  { id: 2, src: "src/assets/mindefault.png", alt: "Memory 3", index: -1 },
+  { id: 3, src: "src/assets/mindefault.png", alt: "Memory 3", index: -1 },
+  { id: 4, src: "src/assets/mindefault.png", alt: "Memory 3", index: -1 },
+  { id: 5, src: "src/assets/mindefault.png", alt: "Memory 3", index: -1 },
+  { id: 6, src: "src/assets/mindefault.png", alt: "Memory 3", index: -1 },
+  { id: 7, src: "src/assets/mindefault.png", alt: "Memory 3", index: -1 },
+  { id: 8, src: "src/assets/min1.png", alt: "Memory 1", index: 0 },
+  { id: 9, src: "src/assets/min2.png", alt: "Memory 2", index: 1 },
 ]
 
 const IMAGE_WIDTH = 340;
@@ -120,7 +120,7 @@ export default function MemoryGrid({ onMemoryClick }: MemoryGridProps){
               top: image.y,
               zIndex: image.zIndex
             }}
-            onClick={() => onMemoryClick(image.type)}
+            onClick={ () => onMemoryClick(image.index)}
           >
             <div className="memory-label">
               memory nr {String(image.id).padStart(3, "0")}

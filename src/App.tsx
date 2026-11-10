@@ -8,19 +8,20 @@ import Overlay from './common/Overlay';
 
 function App() {
 
-  const [selectedMemory, setSelectedMemory] = useState<string>("none");
+  const [selectedMemory, setSelectedMemory] = useState<number>(-1);
+  console.log(selectedMemory)
 
   return (
     <EyeTrackingProvider>
-      <Header onHistoryClick={setSelectedMemory} />
+      <Header onHistoryClick={() => setSelectedMemory(-2)} />
 
       <Overlay onBackClick={setSelectedMemory} selectedMemory={selectedMemory}/>
 
-      <div style={{ display: selectedMemory === "image" ? "block" : "none" }}>
-        <ImageGrid isActive={selectedMemory === "image"}/>
+      <div style={{ display: selectedMemory < 0 ? "none" : "block"}}>
+        <ImageGrid isActive={selectedMemory >= 0} memoryIdx={selectedMemory}/>
       </div>
 
-      <div style={{ display: selectedMemory === "image" ? "none" : "block" }}>
+      <div style={{ display: selectedMemory === -1 ? "block" : "none" }}>
         <MemoryGrid onMemoryClick={setSelectedMemory} />
       </div>
   
