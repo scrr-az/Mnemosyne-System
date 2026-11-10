@@ -1,15 +1,20 @@
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "./ImageGrid.css";
+
+interface ImageGridProps {
+  isActive: boolean;
+}
 
 type ImageItem = {
   id: number;
   src: string;
   alt: string;
+  variations?: string[];
 };
 
 const images: ImageItem[] = [
-  { id: 1, src: "src/assets/1.png", alt: "Image 1" },
+  { id: 1, src: "src/assets/1.png", alt: "Image 1", variations: ["src/assets/1-variation1.png", "src/assets/1-variation2.png", "src/assets/1-variation3.png"] },
   { id: 2, src: "src/assets/2.png", alt: "Image 2" },
   { id: 3, src: "src/assets/3.png", alt: "Image 3" },
   { id: 4, src: "src/assets/4.png", alt: "Image 4" },
@@ -51,7 +56,49 @@ function generatePositions(items: ImageItem[]) {
   });
 }
 
-export default function ImageGrid() {
+export default function ImageGrid({ isActive } : ImageGridProps) {
+  const [displayedSources, setDisplayedSources] = useState<Record<number, string>>({});
+
+  useEffect(() => {
+
+    if (!isActive) return;
+
+    const interval = setInterval(() => {
+      setDisplayedSources((previous) => {
+        // Only images that have variations
+        const candidates = images.filter(
+          (image) => image.variations && image.variations.length > 0
+        );
+
+        if (candidates.length === 0) return previous;
+
+        // Pick a random image
+        const selected =
+          candidates[Math.floor(Math.random() * candidates.length)];
+
+        // Get all possible versions of that image
+        const options = [selected.src, ...selected.variations!];
+
+        // Current version
+        const current = previous[selected.id] ?? selected.src;
+
+        // Avoid selecting the same version
+        const available = options.filter((src) => src !== current);
+
+        const next =
+          available[Math.floor(Math.random() * available.length)];
+
+        return {
+          ...previous,
+          [selected.id]: next,
+        };
+      });
+    }, 3000); // Every 3 seconds
+
+    return () => clearInterval(interval);
+  }, [isActive]);
+
+  // generate positions of the images
   const positions = useMemo(
     () => generatePositions(images),
     []
@@ -108,7 +155,7 @@ export default function ImageGrid() {
             <div className="image-label">
               IMG-{String(image.id).padStart(3, "0")}
             </div>
-            <img src={image.src} alt={image.alt} />
+            <img src={displayedSources[image.id] ?? image.src}  alt={image.alt} />
             </div>
         ))}
       </div>

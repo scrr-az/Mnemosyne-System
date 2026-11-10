@@ -10,27 +10,19 @@ function App() {
 
   const [selectedMemory, setSelectedMemory] = useState<string>("none");
 
-  let content;
-
-  switch (selectedMemory) {
-    case "image":
-      content = <ImageGrid />;
-      break;
-
-    default:
-      content = (
-        <MemoryGrid
-          onMemoryClick={setSelectedMemory}
-        />
-      );
-      break;
-  }
-
   return (
     <EyeTrackingProvider>
       <Header onHistoryClick={setSelectedMemory} />
+
       <Overlay onBackClick={setSelectedMemory} selectedMemory={selectedMemory}/>
-      {content}
+
+      <div style={{ display: selectedMemory === "image" ? "block" : "none" }}>
+        <ImageGrid isActive={selectedMemory === "image"}/>
+      </div>
+
+      <div style={{ display: selectedMemory === "image" ? "none" : "block" }}>
+        <MemoryGrid onMemoryClick={setSelectedMemory} />
+      </div>
   
     </EyeTrackingProvider>
   );
