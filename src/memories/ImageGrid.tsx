@@ -133,6 +133,7 @@ const memoryPositions: PositionedImage[][] = memories.map(
 export default function ImageGrid({ isActive, memoryIdx, onBackClick } : ImageGridProps) {
   const [displayedSources, setDisplayedSources] = useState<Record<string, string>>({});
   const [selectedMemory, setSelectedMemory] = useState<PositionedImage | null>(null);
+  const [changedImages, setChangedImages] = useState<Set<string>>(new Set());
 
   // Store the changes to the text memories
   const [textMemories, setTextMemories] = useState<Record<number, string>>({
@@ -141,44 +142,66 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick } : ImageGr
 
   // Function to change the images
   useEffect(() => {
-
-    // If it is not showing this memory, do not change images
-    if (!isActive) return;
+    // Reset when the overlay closes
+    if (!selectedMemory || !isActive) {
+      setChangedImages(new Set());
+      return;
+    }
 
     const interval = setInterval(() => {
-      setDisplayedSources((previous) => {
-        // Only images that have variations
-        const candidates = memories[memoryIdx].filter(
-          (image) => image.variations && image.variations.length > 0
-        );
 
-        if (candidates.length === 0) return previous;
+      const candidates = memories[memoryIdx].filter(image => {
+        // Only images with variations
+        if (!image.variations?.length) return false;
 
-        // Pick a random image
-        const selected =
-          candidates[Math.floor(Math.random() * candidates.length)];
+        // Don't change the currently open image
+        if (
+          selectedMemory.type === "image" &&
+          selectedMemory.id === image.id
+        ) {
+          return false;
+        }
 
-        // Get all possible versions of that image
-        const options = [selected.src, ...selected.variations!];
+        // Don't change an image twice
+        const key = `${memoryIdx}-${image.id}`;
 
-        // Current version
-        const sourceKey = `${memoryIdx}-${selected.id}`;
-        const current = previous[sourceKey] ?? selected.src;
-
-        // Avoid selecting the same version
-        const available = options.filter((src) => src !== current);
-
-        const next = available[Math.floor(Math.random() * available.length)];
-
-        return {
-          ...previous,
-          [sourceKey]: next,
-        };
+        return !changedImages.has(key);
       });
-    }, 10000); // Every 10 seconds
+
+      // No more eligible images
+      if (candidates.length === 0) return;
+
+      // Pick one random image
+      const selected =
+        candidates[Math.floor(Math.random() * candidates.length)];
+
+      const sourceKey = `${memoryIdx}-${selected.id}`;
+
+      // Get possible variations
+      const options = [selected.src, ...selected.variations!];
+
+      const current = displayedSources[sourceKey] ?? selected.src;
+
+      const available = options.filter(src => src !== current);
+
+      if (available.length === 0) return;
+
+      const next = available[Math.floor(Math.random() * available.length)];
+
+      // Change the image
+      setDisplayedSources(previous => ({
+        ...previous,
+        [sourceKey]: next,
+      }));
+
+      // Mark it as already changed
+      setChangedImages(previous => new Set([...previous, sourceKey]));
+
+    }, 5000);
 
     return () => clearInterval(interval);
-  }, [isActive, memoryIdx]);
+
+  }, [selectedMemory, memoryIdx, isActive, changedImages, displayedSources]);
 
   const positions = memoryPositions[memoryIdx] ?? [];
 
