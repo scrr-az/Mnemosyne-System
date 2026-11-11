@@ -1,14 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 
 /* Overall font */
 
-body {
+h1 {
     font-family: "Merriweather", serif;
     font-optical-sizing: auto;
     font-weight: 500;
     font-style: normal;
     font-variation-settings:
         "wdth" 100;
+
+    margin: 0;
+}
+
+body {
+    font-family: "Courier Prime", monospace;
+    font-weight: 400;
+    font-style: normal;
 
     margin: 0;
 }

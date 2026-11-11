@@ -1,42 +1,89 @@
 
 import { useEffect, useState } from "react";
+import ImageMemory from "./ImageMemory";
+import TextMemory from "./TextMemory";
+import Overlay from "../common/Overlay";
 import "./ImageGrid.css";
 
 interface ImageGridProps {
   isActive: boolean;
   memoryIdx: number;
+  onBackClick: () => void;
 }
 
-type ImageItem = {
-  id: number;
-  src: string;
-  alt: string;
-  variations?: string[];
-};
+type MemoryItem =
+  | {
+      id: number;
+      type: "image";
+      src: string;
+      alt: string;
+      variations?: string[];
+    }
+  | {
+      id: number;
+      type: "text";
+      src: string;
+      alt: string;
+      variations?: string[]
+    };
 
-const images_graduation: ImageItem[] = [
-  { id: 1, src: "src/assets/graduation/1.png", alt: "Image 1", variations: ["src/assets/graduation/1-variation1.png", "src/assets/graduation/1-variation2.png", "src/assets/graduation/1-variation3.png"] },
-  { id: 2, src: "src/assets/graduation/2.png", alt: "Image 2" },
-  { id: 3, src: "src/assets/graduation/3.png", alt: "Image 3" },
-  { id: 4, src: "src/assets/graduation/4.png", alt: "Image 4" },
-  { id: 5, src: "src/assets/graduation/5.png", alt: "Image 5" },
-  { id: 6, src: "src/assets/graduation/6.png", alt: "Image 6" },
-  { id: 7, src: "src/assets/graduation/7.png", alt: "Image 7" },
-  { id: 8, src: "src/assets/graduation/8.png", alt: "Image 8" },
+const images_graduation: MemoryItem[] = [
+  { id: 1, src: "src/assets/graduation/1.png", alt: "Image 1",
+    variations: ["src/assets/graduation/1-variation1.png", "src/assets/graduation/1-variation2.png", "src/assets/graduation/1-variation3.png"],
+    type: "image"
+  },
+  { id: 2, src: "src/assets/graduation/2.png", alt: "Image 2",
+    type: "text"
+  },
+  { id: 3, src: "src/assets/graduation/3.png", alt: "Image 3",
+    type: "image"
+  },
+  { id: 4, src: "src/assets/graduation/4.png", alt: "Image 4",
+    type: "image"
+  },
+  { id: 5, src: "src/assets/graduation/5.png", alt: "Image 5",
+    type: "image"
+  },
+  { id: 6, src: "src/assets/graduation/6.png", alt: "Image 6",
+    type: "image"
+  },
+  { id: 7, src: "src/assets/graduation/7.png", alt: "Image 7",
+    type: "image"
+  },
+  { id: 8, src: "src/assets/graduation/8.png", alt: "Image 8",
+    type: "image"
+  },
 ];
 
-const images_love: ImageItem[] = [
-  { id: 2, src: "src/assets/love/1.png", alt: "Image 2", variations: ["src/assets/love/1-variation1.png", "src/assets/graduation/1-variation2.png", "src/assets/graduation/1-variation3.png"] },
-  { id: 1, src: "src/assets/love/2.png", alt: "Image 1" },
-  { id: 3, src: "src/assets/love/3.png", alt: "Image 3" },
-  { id: 4, src: "src/assets/love/4.png", alt: "Image 4" },
-  { id: 5, src: "src/assets/love/5.png", alt: "Image 5" },
-  { id: 6, src: "src/assets/love/6.png", alt: "Image 6" },
-  { id: 7, src: "src/assets/love/7.png", alt: "Image 7" },
-  { id: 8, src: "src/assets/love/8.png", alt: "Image 8" },
+const images_love: MemoryItem[] = [
+  { id: 2, src: "src/assets/love/1.png", alt: "Image 2",
+    variations: ["src/assets/love/1-variation1.png", "src/assets/graduation/1-variation2.png", "src/assets/graduation/1-variation3.png"],
+    type: "image"
+  },
+  { id: 1, src: "src/assets/love/2.png", alt: "Image 1",
+    type: "image"
+  },
+  { id: 3, src: "src/assets/love/3.png", alt: "Image 3",
+    type: "image"
+  },
+  { id: 4, src: "src/assets/love/4.png", alt: "Image 4",
+    type: "image"
+  },
+  { id: 5, src: "src/assets/love/5.png", alt: "Image 5",
+    type: "image"
+  },
+  { id: 6, src: "src/assets/love/6.png", alt: "Image 6",
+    type: "image"
+  },
+  { id: 7, src: "src/assets/love/7.png", alt: "Image 7",
+    type: "image"
+  },
+  { id: 8, src: "src/assets/love/8.png", alt: "Image 8",
+    type: "image"
+  },
 ];
 
-const memories: ImageItem[][] = [
+const memories: MemoryItem[][] = [
   images_graduation,
   images_love
 ];
@@ -48,7 +95,7 @@ const IMAGE_SIZE = 100;
 const LABEL_HEIGHT = 18;
 const CELL_HEIGHT = IMAGE_SIZE + LABEL_HEIGHT + 10;
 
-function generatePositions(items: ImageItem[], initialSeed: number) {
+function generatePositions(items: MemoryItem[], initialSeed: number) {
   let seed = initialSeed;
 
   const random = () => {
@@ -73,7 +120,7 @@ function generatePositions(items: ImageItem[], initialSeed: number) {
   });
 }
 
-type PositionedImage = ImageItem & {
+type PositionedImage = MemoryItem & {
   column: number;
   row: number;
 };
@@ -83,8 +130,14 @@ const memoryPositions: PositionedImage[][] = memories.map(
   (memory, index) => generatePositions(memory, 2603 + index * 2000)
 );
 
-export default function ImageGrid({ isActive, memoryIdx } : ImageGridProps) {
+export default function ImageGrid({ isActive, memoryIdx, onBackClick } : ImageGridProps) {
   const [displayedSources, setDisplayedSources] = useState<Record<string, string>>({});
+  const [selectedMemory, setSelectedMemory] = useState<PositionedImage | null>(null);
+
+  // Store the changes to the text memories
+  const [textMemories, setTextMemories] = useState<Record<number, string>>({
+    2: "My graduation memory...",
+  });
 
   // Function to change the images
   useEffect(() => {
@@ -146,6 +199,8 @@ export default function ImageGrid({ isActive, memoryIdx } : ImageGridProps) {
         height: ROWS * CELL_HEIGHT,
       }}
     >
+      <Overlay onBackClick={onBackClick} selectedMemory={selectedMemory !== null}/>
+
       {/* Dots */}
       <div className="dot-layer">
       {dots.map(dot => (
@@ -170,6 +225,7 @@ export default function ImageGrid({ isActive, memoryIdx } : ImageGridProps) {
       >
         {positions.map(image => {
           const sourceKey = `${memoryIdx}-${image.id}`;
+          const displayedSrc = displayedSources[sourceKey] ?? image.src;
 
           return (
             <div
@@ -179,19 +235,49 @@ export default function ImageGrid({ isActive, memoryIdx } : ImageGridProps) {
                 gridColumn: image.column,
                 gridRow: image.row,
               }}
+              onClick={() => setSelectedMemory(image)}
             >
               <div className="image-label">
                 IMG-{String(image.id).padStart(3, "0")}
               </div>
 
               <img
-                src={displayedSources[sourceKey] ?? image.src}
+                src={displayedSrc}
                 alt={image.alt}
               />
             </div>
           );
         })}
       </div>
+      {selectedMemory && (
+      <div
+        className="memory-overlay"
+        onClick={() => setSelectedMemory(null)}
+      >
+        <div
+          className="memory-content"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {selectedMemory.type === "image" && (
+            <ImageMemory
+              src={
+                displayedSources[
+                  `${memoryIdx}-${selectedMemory.id}`
+                ] ?? selectedMemory.src
+              }
+              onClose={() => setSelectedMemory(null)}
+            />
+          )}
+
+          {selectedMemory.type === "text" && (
+            <TextMemory
+              src={textMemories[selectedMemory.id + memoryIdx * 10] ?? ""}
+              onClose={() => setSelectedMemory(null)}
+            />
+          )}
+        </div>
+      </div>
+    )}
     </div>
   );
 }

@@ -4,21 +4,17 @@ import Header from './common/Header';
 import MemoryGrid from './menus/MemoryGrid';
 import './App.css';
 import { useState } from 'react';
-import Overlay from './common/Overlay';
 
 function App() {
 
   const [selectedMemory, setSelectedMemory] = useState<number>(-1);
-  console.log(selectedMemory)
 
   return (
     <EyeTrackingProvider>
       <Header onHistoryClick={() => setSelectedMemory(-2)} />
 
-      <Overlay onBackClick={setSelectedMemory} selectedMemory={selectedMemory}/>
-
       <div style={{ display: selectedMemory < 0 ? "none" : "block"}}>
-        <ImageGrid isActive={selectedMemory >= 0} memoryIdx={selectedMemory}/>
+        <ImageGrid isActive={selectedMemory >= 0} memoryIdx={selectedMemory} onBackClick={() => setSelectedMemory(-1)}/>
       </div>
 
       <div style={{ display: selectedMemory === -1 ? "block" : "none" }}>
