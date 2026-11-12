@@ -15,18 +15,32 @@ type QuizItem = {
   correctIdx: number;
 }
 
+// 1 to 10 is graduation
+// 11 to 20 is love
 const quizes: QuizItem[] = [
   {
     id: 1,
-    question: "Question for the first memory",
-    answers: ["answer 1", "answer 2", "answer 3", "answer 4"],
-    correctIdx: 1
+    question: "What color was the hat originally?",
+    answers: ["Black", "Blue", "Red"],
+    correctIdx: 0
   },
   {
     id: 2,
-    question: "Question for the second memory",
-    answers: ["answer 1", "answer 2", "answer 3", "answer 4"],
+    question: "In class, how many people were in front of you?",
+    answers: ["1 student", "2 students", "2 students and 1 teacher"],
     correctIdx: 1
+  },
+  {
+    id: 11,
+    question: "What piece of jewellery was originally shown in the photo?",
+    answers: ["Bracelet", "Ring", "Earring"],
+    correctIdx: 1
+  },
+  {
+    id: 12,
+    question: "What item was originally on the table?",
+    answers: ["Plant", "Candle", "Nothing"],
+    correctIdx: 2
   },
 ];
 

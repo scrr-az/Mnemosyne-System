@@ -36,11 +36,12 @@ type MemoryItem =
 
 const images_graduation: MemoryItem[] = [
   { id: 1, src: "src/assets/graduation/1.png", alt: "Image 1",
-    variations: ["src/assets/graduation/1-variation1.png", "src/assets/graduation/1-variation2.png", "src/assets/graduation/1-variation3.png"],
+    variations: ["src/assets/graduation/1-variation.png"],
     type: "image"
   },
   { id: 2, src: "src/assets/graduation/2.png", alt: "Image 2",
-    type: "text"
+    variations: ["src/assets/graduation/2-variation.png"],
+    type: "image"
   },
   { id: 3, src: "src/assets/graduation/3.png", alt: "Image 3",
     type: "image"
@@ -63,15 +64,16 @@ const images_graduation: MemoryItem[] = [
 ];
 
 const images_love: MemoryItem[] = [
-  { id: 2, src: "src/assets/love/1.png", alt: "Image 2",
-    variations: ["src/assets/love/1-variation1.png", "src/assets/graduation/1-variation2.png", "src/assets/graduation/1-variation3.png"],
+  { id: 1, src: "src/assets/love/1.png", alt: "Image 1",
+    variations: ["src/assets/love/1-variation.png"],
     type: "image"
   },
-  { id: 1, src: "src/assets/love/2.png", alt: "Image 1",
+  { id: 2, src: "src/assets/love/2.png", alt: "Image 2",
+    variations: ["src/assets/love/2-variation.png"],
     type: "image"
   },
   { id: 3, src: "src/assets/love/3.png", alt: "Image 3",
-    type: "image"
+    type: "text"
   },
   { id: 4, src: "src/assets/love/4.png", alt: "Image 4",
     type: "image"
@@ -108,8 +110,8 @@ type TextMemoryData = {
 
 // + 10 if it is the second set of memories (love)
 const textMemoryData: Record<number, TextMemoryData> = {
-  2: {
-    id: 2,
+  13: {
+    id: 13,
     sentences: [
       {original: "Hey you,\n\nI've been wanting to write this for a while, but I never really knew how to put it into words.\n\nI keep thinking about graduation night. You were wearing that "},
       {original: "dark blue dress", variations:["red satin dress"]},
