@@ -12,6 +12,8 @@ interface ImageGridProps {
   memoryIdx: number;
   onBackClick: () => void;
   setHistory: React.Dispatch<React.SetStateAction<HistoryEntry[]>>;
+  resetMemories: boolean;
+  setResetMemories: (value: boolean) => void;
 }
 
 type MemoryItem =
@@ -164,10 +166,14 @@ const memoryPositions: PositionedImage[][] = memories.map(
   (memory, index) => generatePositions(memory, 2603 + index * 2000)
 );
 
-export default function ImageGrid({ isActive, memoryIdx, onBackClick, setHistory } : ImageGridProps) {
+export default function ImageGrid({ isActive, memoryIdx, onBackClick, setHistory, resetMemories, setResetMemories } : ImageGridProps) {
   const [displayedSources, setDisplayedSources] = useState<Record<string, string>>({});
   const [selectedMemory, setSelectedMemory] = useState<PositionedImage | null>(null);
   const [changedImages, setChangedImages] = useState<Set<string>>(new Set());
+
+  // Reporting anomaly
+  const [isSelectingQuizMemory, setIsSelectingQuizMemory] = useState(false);
+  const [quizMemory, setQuizMemory] = useState<number | null>(null);
 
   // Store the changes to the text memories
   const [textMemories, setTextMemories] = useState<Record<number, string[]>>(
@@ -182,6 +188,32 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick, setHistory
   const [changedSentences, setChangedSentences] = useState<Set<string>>(
     new Set()
   );
+
+
+  // clear everything
+  useEffect(() => {
+    setDisplayedSources({});
+    setSelectedMemory(null);
+    setChangedImages(new Set());
+
+    setTextMemories(
+      Object.fromEntries(
+        Object.entries(textMemoryData).map(([id, memory]) => [
+          Number(id),
+          memory.sentences.map(sentence => sentence.original),
+        ])
+      )
+    );
+
+    setChangedSentences(new Set());
+
+    setIsSelectingQuizMemory(false);
+    setQuizMemory(null);
+
+    // finished reseting
+    setResetMemories(false);
+
+  }, [resetMemories]);
 
   useEffect(() => {
     if (
@@ -260,10 +292,6 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick, setHistory
     return () => clearInterval(interval);
 
   }, [selectedMemory, memoryIdx, isActive, changedSentences]);
-
-  // Reporting anomaly
-  const [isSelectingQuizMemory, setIsSelectingQuizMemory] = useState(false);
-  const [quizMemory, setQuizMemory] = useState<number | null>(null);
 
   function handleReportClick(){
     if(selectedMemory){

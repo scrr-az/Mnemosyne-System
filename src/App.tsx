@@ -11,10 +11,21 @@ function App() {
   const [selectedMemory, setSelectedMemory] = useState<number>(-1);
 
   const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [resetMemories, setResetMemories] = useState<boolean>(false);
+
+  function handleHistoryClick () {
+    if(selectedMemory === -2){
+      setSelectedMemory(-1);
+      setHistory([]);
+      setResetMemories(true);
+      return;
+    }
+    setSelectedMemory(-2);
+  }
 
   return (
     <EyeTrackingProvider>
-      <Header onHistoryClick={() => setSelectedMemory(-2)} />
+      <Header onHistoryClick={handleHistoryClick} isHistoryPage={selectedMemory === -2}/>
 
       <div style={{ display: selectedMemory >= 0 ? "block" : "none" }}>
         <ImageGrid
@@ -22,6 +33,8 @@ function App() {
           memoryIdx={selectedMemory}
           onBackClick={() => setSelectedMemory(-1)}
           setHistory={setHistory}
+          resetMemories={resetMemories}
+          setResetMemories={setResetMemories}
         />
       </div>
 
@@ -32,7 +45,6 @@ function App() {
       {selectedMemory === -2 && (
         <History
           entries={history}
-          onBack={() => setSelectedMemory(-1)}
         />
       )}
 
