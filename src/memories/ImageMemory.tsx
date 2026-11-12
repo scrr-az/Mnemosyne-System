@@ -8,8 +8,8 @@ interface ImageMemoryProps {
 export default function ImageMemory({ src, onClose } : ImageMemoryProps) {
   return(
     <div className="memory-overlay">
-      <div className='memory-card'>
-        <p onClick={onClose}>[x]</p>
+      <div className='memory-content-card'>
+        <button onClick={onClose} className='back-button-memories'>[x]</button>
         <img src={src} alt="Memory Image" />
       </div>
     </div>

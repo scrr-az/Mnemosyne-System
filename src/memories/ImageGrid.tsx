@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import ImageMemory from "./ImageMemory";
 import TextMemory from "./TextMemory";
 import Overlay from "../common/Overlay";
+import ReportQuiz from "./ReportQuiz";
 import "./ImageGrid.css";
 
 interface ImageGridProps {
@@ -88,6 +89,37 @@ const memories: MemoryItem[][] = [
   images_love
 ];
 
+/* TEXT ITEMS */
+type TextSentence = {
+  original: string;
+  variations?: string[];
+};
+
+type TextMemoryData = {
+  id: number;
+  sentences: TextSentence[];
+};
+
+// + 10 if it is the second set of memories (love)
+const textMemoryData: Record<number, TextMemoryData> = {
+  2: {
+    id: 2,
+    sentences: [
+      {original: "Hey you,\n\nI've been wanting to write this for a while, but I never really knew how to put it into words.\n\nI keep thinking about graduation night. You were wearing that "},
+      {original: "dark blue dress ", variations:["red satin dress "]},
+      {original: "(the one you said was a last-minute choice), and I had my "},
+      {original: "stupid black suit with the slightly crooked tie. ", variations:["elegant white suit with a perfectly straight tie. "]},
+      {original: "I still remember the little golden lights hanging above the dance floor and how cold it was outside compared to the crowded room.\n\nYou probably don't remember, but when we first started talking, you said, \""},
+      {original: "I don't usually dance, but I guess tonight is an exception.\" ", variations:["I was secretly hoping you'd ask me to dance tonight.\" "]},
+      {original: "I think about that sentence more often than I should.\n\nI remember us sitting by the "},
+      {original: "staircase, ", variations:["balcony doors, "]},
+      {original: "sharing a "},
+      {original: "glass of lemonade, ", variations:["glass of orangeade, "]},
+      {original: "while everyone else was taking pictures. You laughed at one of my terrible jokes, and honestly, I think that's when I started falling for you.\nIt's only been a few months, but somehow it feels like I've known you much longer.I don't want to make this complicated, so I'll just say it: I think I'm falling in love with you.And I hope you feel it too.\n\nYours,\nA."}
+    ]
+  }
+}
+
 const COLUMNS = 8;
 const ROWS = 6;
 const CELL_WIDTH = 100 + 10;
@@ -136,9 +168,93 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick } : ImageGr
   const [changedImages, setChangedImages] = useState<Set<string>>(new Set());
 
   // Store the changes to the text memories
-  const [textMemories, setTextMemories] = useState<Record<number, string>>({
-    2: "My graduation memory...",
-  });
+  const [textMemories, setTextMemories] = useState<Record<number, string[]>>(
+    () =>
+      Object.fromEntries(
+        Object.entries(textMemoryData).map(([id, memory]) => [
+          Number(id),
+          memory.sentences.map(sentence => sentence.original),
+        ])
+      )
+  );
+  const [changedSentences, setChangedSentences] = useState<Set<string>>(
+    new Set()
+  );
+
+  useEffect(() => {
+    if (
+      !selectedMemory ||
+      selectedMemory.type !== "text" ||
+      !isActive
+    ) return;
+
+    const memoryKey = memoryIdx * 10 + selectedMemory.id;
+    const originalMemory = textMemoryData[memoryKey];
+
+    if (!originalMemory) return;
+
+    const interval = setInterval(() => {
+
+      // Find sentences that haven't changed yet
+      const candidates = originalMemory.sentences
+        .map((sentence, index) => ({
+          sentence,
+          index,
+          key: `${memoryIdx}-${selectedMemory.id}-${index}`,
+        }))
+        .filter(item => !changedSentences.has(item.key));
+
+      if (candidates.length === 0) return;
+
+      // Select one random sentence
+      const selected =
+        candidates[Math.floor(Math.random() * candidates.length)];
+
+      // Select one random variation
+      const variations = selected.sentence.variations;
+
+      if (!variations) return;
+
+      const variation =
+        variations[Math.floor(Math.random() * variations.length)];
+
+      // Update only that sentence
+      setTextMemories(previous => {
+        const current = previous[memoryKey] ??
+          originalMemory.sentences.map(s => s.original);
+
+        const updated = [...current];
+        updated[selected.index] = variation;
+
+        return {
+          ...previous,
+          [memoryKey]: updated,
+        };
+      });
+
+      // Remember that this sentence has changed
+      setChangedSentences(previous =>
+        new Set([...previous, selected.key])
+      );
+
+    }, 5000);
+
+    return () => clearInterval(interval);
+
+  }, [selectedMemory, memoryIdx, isActive, changedSentences]);
+
+  // Reporting anomaly
+  const [isSelectingQuizMemory, setIsSelectingQuizMemory] = useState(false);
+  const [quizMemory, setQuizMemory] = useState<number | null>(null);
+
+  function handleMemoryClick(image: PositionedImage) {
+    if (isSelectingQuizMemory) {
+      setQuizMemory(image.id + memoryIdx * 10);
+      setIsSelectingQuizMemory(false);
+      return;
+    }
+    setSelectedMemory(image);
+  }
 
   // Function to change the images
   useEffect(() => {
@@ -222,7 +338,14 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick } : ImageGr
         height: ROWS * CELL_HEIGHT,
       }}
     >
-      <Overlay onBackClick={onBackClick} selectedMemory={selectedMemory !== null}/>
+      {!quizMemory && (<Overlay
+        onBackClick={onBackClick}
+        selectedMemory={selectedMemory !== null}
+        onReportClick={() => {
+          setSelectedMemory(null);
+          setIsSelectingQuizMemory(true);
+        }}
+      />)}
 
       {/* Dots */}
       <div className="dot-layer">
@@ -253,12 +376,12 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick } : ImageGr
           return (
             <div
               key={image.id}
-              className="image-card"
+              className={`image-card ${isSelectingQuizMemory ? "quiz-selectable" : ""}`}
               style={{
                 gridColumn: image.column,
                 gridRow: image.row,
               }}
-              onClick={() => setSelectedMemory(image)}
+              onClick={() => handleMemoryClick(image)}
             >
               <div className="image-label">
                 IMG-{String(image.id).padStart(3, "0")}
@@ -273,13 +396,8 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick } : ImageGr
         })}
       </div>
       {selectedMemory && (
-      <div
-        className="memory-overlay"
-        onClick={() => setSelectedMemory(null)}
-      >
         <div
           className="memory-content"
-          onClick={(e) => e.stopPropagation()}
         >
           {selectedMemory.type === "image" && (
             <ImageMemory
@@ -294,13 +412,20 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick } : ImageGr
 
           {selectedMemory.type === "text" && (
             <TextMemory
-              src={textMemories[selectedMemory.id + memoryIdx * 10] ?? ""}
+              sentences={
+                textMemories[selectedMemory.id + memoryIdx * 10] ?? []
+              }
               onClose={() => setSelectedMemory(null)}
             />
           )}
         </div>
-      </div>
-    )}
+      )}
+      {quizMemory && (
+        <ReportQuiz
+          memory={quizMemory}
+          onClose={() => setQuizMemory(null)}
+        />
+      )}
     </div>
   );
 }

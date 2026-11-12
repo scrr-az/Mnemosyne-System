@@ -21,3 +21,20 @@ body {
 
     margin: 0;
 }
+
+/* Make buttons look like regular paragraphs*/
+
+button {
+    background: none;
+    border: none;
+    color: black;
+
+    font-family: "Courier Prime", monospace;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 100%;
+
+    margin: 0;
+
+    cursor: pointer;
+}

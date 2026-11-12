@@ -15,9 +15,21 @@
   z-index: 2;
 }
 
-.memory-card {
+.memory-content-card {
+  width: 60%;
+  min-height: 70%;
+
   background-color: white;
   border: 1px solid black;
 
   cursor: default;
+}
+
+.letter {
+  white-space: pre-wrap;
+  padding: 5%;
+}
+
+.back-button-memories {
+  padding: 5% 0% 0% 5%;
 }

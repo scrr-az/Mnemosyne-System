@@ -1,17 +1,27 @@
 import './MemoryOverlay.css';
 
 interface TextMemoryProps {
-  src: string;
+  sentences: string[];
   onClose: () => void;
 }
 
-export default function TextMemory({ src, onClose } : TextMemoryProps){
-    return(
-        <div className="memory-overlay">
-            <div className='memory-card'>
-                <p onClick={onClose}>[x]</p>
-                <p className='letter'>{src}</p>
-            </div>
-        </div>
-    )
+export default function TextMemory({
+  sentences,
+  onClose
+}: TextMemoryProps) {
+  return (
+    <div className="memory-overlay">
+      <div className="memory-content-card">
+        <button onClick={onClose} className='back-button-memories'>[x]</button>
+
+        <p className="letter">
+          {sentences.map((sentence, index) => (
+            <span key={index}>
+              {sentence}
+            </span>
+          ))}
+        </p>
+      </div>
+    </div>
+  );
 }
