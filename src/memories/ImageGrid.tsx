@@ -371,7 +371,7 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick, setHistory
 
       // Text memories require sentence selection
       if (selectedMemory.type === "text") {
-        setIsSelectingTextSentence(true);
+        setIsSelectingTextSentence((prev) => !prev);
         return;
       }
 
@@ -381,7 +381,7 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick, setHistory
     }
 
     setQuizMemory(null);
-    setIsSelectingQuizMemory(true);
+    setIsSelectingQuizMemory((prev) => !prev);
   }
 
   function handleMemoryClick(image: PositionedImage) {
@@ -408,7 +408,7 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick, setHistory
 
     // Check whether the answer matches the original sentence
     if (answer !== originalSentence) {
-      alert("Incorrect answer. The sentence has not been restored.");
+      setIsSelectingTextSentence(false);
       return;
     }
 
@@ -620,6 +620,7 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick, setHistory
         onBackClick={onBackClick}
         selectedMemory={selectedMemory !== null}
         onReportClick={handleReportClick}
+        isSelectingQuiz={isSelectingQuizMemory || isSelectingTextSentence}
         integrity={integrity}
       />)}
 

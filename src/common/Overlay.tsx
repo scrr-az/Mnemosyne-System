@@ -4,14 +4,16 @@ interface OverlayProps {
   onBackClick: () => void;
   selectedMemory: boolean;
   onReportClick: () => void;
+  isSelectingQuiz: boolean;
   integrity: number;
 }
 
-export default function Overlay({ onBackClick, selectedMemory, onReportClick, integrity } : OverlayProps){
+export default function Overlay({ onBackClick, selectedMemory, onReportClick, isSelectingQuiz, integrity } : OverlayProps){
     return (
-    <div className="overlay">
-        { selectedMemory ? null : <p className="back-button" onClick={onBackClick}>[back]</p> }
-        <p className='integrity-info'>Integrity: {integrity}%</p>
-        <p className='report-button' onClick={onReportClick}>[report an anomaly]</p>
+    <div className={isSelectingQuiz? "overlay choosing" : "overlay"}>
+        { selectedMemory || isSelectingQuiz ? null : <p className="back-button" onClick={onBackClick}>[back]</p> }
+        { isSelectingQuiz ? null: <p className='integrity-info'>Integrity: {integrity}%</p> }
+        { isSelectingQuiz ? <p className='integrity-info'>Click on the memory fragment where you noticed a change.</p> : null}
+        <p className='report-button' onClick={onReportClick}>{isSelectingQuiz ? "[cancel report]" : "[report an anomaly]"}</p>
     </div>)
 }

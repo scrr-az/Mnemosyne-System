@@ -40,13 +40,7 @@ export default function TextMemory({
         >
           [x]
         </button>
-
-        {reportMode && (
-          <p>
-            Select the sentence you believe has been altered.
-          </p>
-        )}
-
+        
         <p className="letter">
           {sentences.map((sentence, index) => (
             <span

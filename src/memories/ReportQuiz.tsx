@@ -76,31 +76,33 @@ export default function ReportQuiz({
                 <p className="question">{quiz.question}</p>
 
                 <form onSubmit={handleSubmit}>
-                {quiz.answers.map((answer, index) => (
-                    <div key={index}>
-                        <input
-                            type="radio"
-                            id={`answer-${index}`}
-                            name="quiz-answer"
-                            value={index}
-                            checked={selectedAnswer === index}
-                            onChange={() => setSelectedAnswer(index)}
-                            disabled={submitted}
-                        />
+                    {quiz.answers.map((answer, index) => (
+                        <div key={index}>
+                            <input
+                                type="radio"
+                                id={`answer-${index}`}
+                                name="quiz-answer"
+                                value={index}
+                                checked={selectedAnswer === index}
+                                onChange={() => setSelectedAnswer(index)}
+                                disabled={submitted}
+                            />
 
-                        <label htmlFor={`answer-${index}`}>
-                            {answer}
-                        </label>
+                            <label htmlFor={`answer-${index}`}>
+                                {answer}
+                            </label>
+                        </div>
+                    ))}
+
+                    <div className="buttons">
+                        <button onClick={onClose}>[cancel report]</button>
+
+                        {!submitted && (
+                            <button type="submit" disabled={selectedAnswer === null}>
+                            [restore fragment]
+                            </button>
+                        )}
                     </div>
-                ))}
-
-                <button onClick={onClose}>[cancel report]</button>
-
-                {!submitted && (
-                    <button type="submit" disabled={selectedAnswer === null}>
-                    [restore fragment]
-                    </button>
-                )}
                 </form>
             </div>
         </div>
