@@ -4,12 +4,14 @@ import ImageMemory from "./ImageMemory";
 import TextMemory from "./TextMemory";
 import Overlay from "../common/Overlay";
 import ReportQuiz from "./ReportQuiz";
+import type { HistoryEntry } from "../common/HistoryTypes";
 import "./ImageGrid.css";
 
 interface ImageGridProps {
   isActive: boolean;
   memoryIdx: number;
   onBackClick: () => void;
+  setHistory: React.Dispatch<React.SetStateAction<HistoryEntry[]>>;
 }
 
 type MemoryItem =
@@ -162,7 +164,7 @@ const memoryPositions: PositionedImage[][] = memories.map(
   (memory, index) => generatePositions(memory, 2603 + index * 2000)
 );
 
-export default function ImageGrid({ isActive, memoryIdx, onBackClick } : ImageGridProps) {
+export default function ImageGrid({ isActive, memoryIdx, onBackClick, setHistory } : ImageGridProps) {
   const [displayedSources, setDisplayedSources] = useState<Record<string, string>>({});
   const [selectedMemory, setSelectedMemory] = useState<PositionedImage | null>(null);
   const [changedImages, setChangedImages] = useState<Set<string>>(new Set());
@@ -218,6 +220,22 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick } : ImageGr
       const variation =
         variations[Math.floor(Math.random() * variations.length)];
 
+      setHistory(previous => [
+        ...previous,
+        {
+          id: Date.now() + Math.random(),
+          memoryIdx,
+          memoryName: memoryIdx === 0 ? "Graduation" : "Love",
+          itemId: selectedMemory.id,
+          itemType: "text",
+          fragmentIndex: selected.index,
+          originalContent: selected.sentence.original,
+          changedContent: variation,
+          recovered: false,
+          timestamp: new Date(),
+        },
+      ]);
+
       // Update only that sentence
       setTextMemories(previous => {
         const current = previous[memoryKey] ??
@@ -266,60 +284,69 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick } : ImageGr
   }
 
   function handleQuizAnswer(correct: boolean) {
-  if (!correct || quizMemory === null) return;
+    if (!correct || quizMemory === null) return;
 
-  const memoryId = quizMemory % 10;
-  const memoryIndex = Math.floor(quizMemory / 10);
+    const memoryId = quizMemory % 10;
+    const memoryIndex = Math.floor(quizMemory / 10);
 
-  const memory = memories[memoryIndex]?.find(
-    item => item.id === memoryId
-  );
+    const memory = memories[memoryIndex]?.find(
+      item => item.id === memoryId
+    );
 
-  if (!memory) return;
+    if (!memory) return;
 
-  // Reset image to original source
-  if (memory.type === "image") {
-    const sourceKey = `${memoryIndex}-${memoryId}`;
+    // Reset image to original source
+    if (memory.type === "image") {
+      const sourceKey = `${memoryIndex}-${memoryId}`;
 
-    setDisplayedSources(previous => {
-      const updated = { ...previous };
-      delete updated[sourceKey];
-      return updated;
-    });
+      setDisplayedSources(previous => {
+        const updated = { ...previous };
+        delete updated[sourceKey];
+        return updated;
+      });
 
-    setChangedImages(previous => {
-      const updated = new Set(previous);
-      updated.delete(sourceKey);
-      return updated;
-    });
-  }
-
-  // Reset text to original sentences
-  if (memory.type === "text") {
-    const originalMemory = textMemoryData[quizMemory];
-
-    if (originalMemory) {
-      setTextMemories(previous => ({
-        ...previous,
-        [quizMemory]: originalMemory.sentences.map(
-          sentence => sentence.original
-        ),
-      }));
-
-      setChangedSentences(previous => {
+      setChangedImages(previous => {
         const updated = new Set(previous);
-
-        originalMemory.sentences.forEach((_, index) => {
-          updated.delete(`${memoryIndex}-${memoryId}-${index}`);
-        });
-
+        updated.delete(sourceKey);
         return updated;
       });
     }
-  }
 
-  setQuizMemory(null);
-}
+    // Reset text to original sentences
+    if (memory.type === "text") {
+      const originalMemory = textMemoryData[quizMemory];
+
+      if (originalMemory) {
+        setTextMemories(previous => ({
+          ...previous,
+          [quizMemory]: originalMemory.sentences.map(
+            sentence => sentence.original
+          ),
+        }));
+
+        setChangedSentences(previous => {
+          const updated = new Set(previous);
+
+          originalMemory.sentences.forEach((_, index) => {
+            updated.delete(`${memoryIndex}-${memoryId}-${index}`);
+          });
+
+          return updated;
+        });
+      }
+    }
+
+    setHistory(previous =>
+      previous.map(entry =>
+        entry.memoryIdx === memoryIndex &&
+        entry.itemId === memoryId
+          ? { ...entry, recovered: true }
+          : entry
+      )
+    );
+
+    setQuizMemory(null);
+  }
 
   // Function to change the images
   useEffect(() => {
@@ -368,6 +395,21 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick } : ImageGr
       if (available.length === 0) return;
 
       const next = available[Math.floor(Math.random() * available.length)];
+
+      setHistory(previous => [
+        ...previous,
+        {
+          id: Date.now() + Math.random(),
+          memoryIdx,
+          memoryName: memoryIdx === 0 ? "Graduation" : "Love",
+          itemId: selected.id,
+          itemType: "image",
+          originalContent: current,
+          changedContent: next,
+          recovered: false,
+          timestamp: new Date(),
+        },
+      ]);
 
       // Change the image
       setDisplayedSources(previous => ({

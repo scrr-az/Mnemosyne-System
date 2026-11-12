@@ -1,26 +1,41 @@
+import { useState } from 'react';
 import { EyeTrackingProvider } from './eyetracker/EyeTracker';
 import ImageGrid from './memories/ImageGrid';
 import Header from './common/Header';
 import MemoryGrid from './menus/MemoryGrid';
+import History from './menus/History';
+import type { HistoryEntry } from './common/HistoryTypes';
 import './App.css';
-import { useState } from 'react';
 
 function App() {
-
   const [selectedMemory, setSelectedMemory] = useState<number>(-1);
+
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
 
   return (
     <EyeTrackingProvider>
       <Header onHistoryClick={() => setSelectedMemory(-2)} />
 
-      <div style={{ display: selectedMemory < 0 ? "none" : "block"}}>
-        <ImageGrid isActive={selectedMemory >= 0} memoryIdx={selectedMemory} onBackClick={() => setSelectedMemory(-1)}/>
+      <div style={{ display: selectedMemory >= 0 ? "block" : "none" }}>
+        <ImageGrid
+          isActive={selectedMemory >= 0}
+          memoryIdx={selectedMemory}
+          onBackClick={() => setSelectedMemory(-1)}
+          setHistory={setHistory}
+        />
       </div>
 
-      <div style={{ display: selectedMemory === -1 ? "block" : "none" }}>
+      {selectedMemory === -1 && (
         <MemoryGrid onMemoryClick={setSelectedMemory} />
-      </div>
-  
+      )}
+
+      {selectedMemory === -2 && (
+        <History
+          entries={history}
+          onBack={() => setSelectedMemory(-1)}
+        />
+      )}
+
     </EyeTrackingProvider>
   );
 }
