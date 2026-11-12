@@ -112,10 +112,33 @@ const images_grandma: MemoryItem[] = [
   }
 ]
 
+const images_job: MemoryItem[] = [
+  { id: 1, src: "src/assets/job/1.png", alt: "Image 1",
+    type: "image"
+  },
+  { id: 2, src: "src/assets/job/2.png", alt: "Image 2",
+    type: "image"
+  },
+  { id: 3, src: "src/assets/job/3.png", alt: "Image 3",
+    type: "image"
+  },
+  { id: 4, src: "src/assets/job/4.png", alt: "Image 4",
+    type: "image"
+  },
+  { id: 5, src: "src/assets/job/5.png", alt: "Image 5",
+    variations: ["src/assets/job/5-variation.png"],
+    type: "image"
+  },
+  { id: 6, src: "src/assets/job/6.png", alt: "Image 6",
+    type: "image"
+  }
+]
+
 const memories: MemoryItem[][] = [
   images_graduation,
   images_love,
-  images_grandma
+  images_grandma,
+  images_job
 ];
 
 /* TEXT ITEMS */
