@@ -11,8 +11,8 @@
 }
 
 .memory-card {
-  width: 340px;
-  height: 236px;
+  width: 170px;
+  height: 118px;
   display: flex;
   flex-direction: column;
   margin: 5px;
@@ -21,7 +21,7 @@
 }
 
 .memory-label {
-  height: 36px;
+  height: 18px;
   box-sizing: border-box;
   padding-left: 10px;
   background: black;
@@ -39,8 +39,8 @@
 
 .memory-card img {
   display: block;
-  width: 340px;
-  height: 200px;
+  width: 170px;
+  height: 100px;
   object-fit: cover;
 
   outline-style: solid;

@@ -13,25 +13,25 @@ type MemoryItem = {
 };
 
 const memories : MemoryItem[] = [
-  { id: 1, src: "src/assets/mindefault.png", alt: "Memory 3", index: -1 },
-  { id: 2, src: "src/assets/mindefault.png", alt: "Memory 3", index: -1 },
-  { id: 3, src: "src/assets/mindefault.png", alt: "Memory 3", index: -1 },
-  { id: 4, src: "src/assets/mindefault.png", alt: "Memory 3", index: -1 },
-  { id: 5, src: "src/assets/mindefault.png", alt: "Memory 3", index: -1 },
+  { id: 1, src: "src/assets/min1.png", alt: "Memory 3", index: -1 },
+  { id: 2, src: "src/assets/min2.png", alt: "Memory 3", index: -1 },
+  { id: 3, src: "src/assets/min3.png", alt: "Memory 3", index: -1 },
+  { id: 4, src: "src/assets/min4.png", alt: "Memory 3", index: -1 },
+  { id: 5, src: "src/assets/min5.png", alt: "Memory 3", index: -1 },
   { id: 6, src: "src/assets/minJob.png", alt: "Memory 6", index: 3 },
   { id: 7, src: "src/assets/minGrandma.png", alt: "Memory 7", index: 2 },
   { id: 8, src: "src/assets/minLove.png", alt: "Memory 8", index: 1 },
   { id: 9, src: "src/assets/minGraduation.png", alt: "Memory 9", index: 0 },
 ]
 
-const IMAGE_WIDTH = 340;
-const IMAGE_HEIGHT = 236;
+const IMAGE_WIDTH = 170;
+const IMAGE_HEIGHT = 118;
 
 const PROTECTED_WIDTH = IMAGE_WIDTH / 2; // 170px
 const PROTECTED_HEIGHT = 36;
 
-const CONTAINER_WIDTH = 1910;
-const CONTAINER_HEIGHT = 800;
+const CONTAINER_WIDTH = 810;
+const CONTAINER_HEIGHT = 600;
 const MAX_ATTEMPTS = 500;
 
 function generatePositions(items: MemoryItem[]) {

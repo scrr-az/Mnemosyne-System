@@ -73,8 +73,8 @@ export default function ReportQuiz({
         return (
         <div className="memory-overlay">
             <div className="quiz-card">
-            <p>No quiz found for this memory.</p>
-            <button onClick={onClose}>Close</button>
+                <button onClick={onClose} className="back-button-memory">[x]</button>
+                <p>No anomaly found in this memory.</p>
             </div>
         </div>
         );

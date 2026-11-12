@@ -11,7 +11,7 @@
 }
 
 .back-button {
-  margin-top: 130px;
+  margin-top: 100px;
   margin-left: 100px;
   cursor: pointer;
   pointer-events: auto;
@@ -20,7 +20,7 @@
 .report-button {
   position: absolute;
   right: 100px;
-  bottom: 50px;
+  bottom: 20px;
   cursor: pointer;
   pointer-events: auto;
 }
@@ -28,5 +28,5 @@
 .integrity-info {
   position: absolute;
   left: 100px;
-  bottom: 50px;
+  bottom: 20px;
 }

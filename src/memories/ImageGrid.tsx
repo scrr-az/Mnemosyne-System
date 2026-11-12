@@ -179,7 +179,7 @@ const textMemoryData: Record<number, TextMemoryData> = {
 }
 
 const COLUMNS = 8;
-const ROWS = 6;
+const ROWS = 4;
 const CELL_WIDTH = 100 + 10;
 const IMAGE_SIZE = 100;
 const LABEL_HEIGHT = 18;
@@ -504,7 +504,10 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick, setHistory
   }
 
   function handleQuizAnswer(correct: boolean) {
-    if (!correct || quizMemory === null) return;
+    if (!correct || quizMemory === null){
+      setQuizMemory(null);
+      return;
+    }
 
     const memoryId = quizMemory % 10;
     const memoryIndex = Math.floor(quizMemory / 10);
@@ -644,7 +647,7 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick, setHistory
 
       handleSetIntegrity(-5);
 
-    }, 5000);
+    }, 3000);
 
     return () => clearInterval(interval);
 
