@@ -64,6 +64,7 @@ export default function TextMemory({
                     : "sentence-selectable"
                   : ""
               }
+              data-sentence-index={index}
             >
               {sentence}
             </span>

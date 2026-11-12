@@ -5,6 +5,8 @@ import TextMemory from "./TextMemory";
 import Overlay from "../common/Overlay";
 import ReportQuiz from "./ReportQuiz";
 import type { HistoryEntry } from "../common/HistoryTypes";
+import { useEyeTracking } from "../eyetracker/EyeTracker";
+import { useRef } from "react";
 import "./ImageGrid.css";
 
 interface ImageGridProps {
@@ -192,6 +194,14 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick, setHistory
 
   const [integrity, setIntegrity] = useState<number>(100);
 
+  // for gaze detection
+  const { gaze } = useEyeTracking();
+  const textMemoryContainerRef = useRef<HTMLDivElement | null>(null);
+  const latestGaze = useRef(gaze);
+
+  // Keep the latest gaze position without restarting the interval
+  latestGaze.current = gaze;
+
   // clear everything
   useEffect(() => {
     setDisplayedSources({});
@@ -220,6 +230,27 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick, setHistory
 
   }, [resetMemories]);
 
+  function isLookingAtElement(
+    element: HTMLElement,
+    gaze: { x: number; y: number },
+    margin = 40
+  ): boolean {
+    const rects = element.getClientRects();
+
+    for (const rect of rects) {
+      if (
+        gaze.x >= rect.left - margin &&
+        gaze.x <= rect.right + margin &&
+        gaze.y >= rect.top - margin &&
+        gaze.y <= rect.bottom + margin
+      ) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   // change sentence
   useEffect(() => {
     if (
@@ -235,25 +266,55 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick, setHistory
 
     const interval = setInterval(() => {
 
-      // Find sentences that haven't changed yet
+      const currentGaze = latestGaze.current;
+
+      // Don't corrupt anything if eye tracking has no valid position
+      if (!currentGaze) return;
+
+      // Find the sentence elements currently displayed
+      const sentenceElements =
+        textMemoryContainerRef.current?.querySelectorAll<HTMLElement>(
+          "[data-sentence-index]"
+        );
+
+      if (!sentenceElements) return;
+
+      // Find sentences that:
+      // 1. Haven't changed yet
+      // 2. Have variations
+      // 3. Aren't currently being looked at
       const candidates = originalMemory.sentences
         .map((sentence, index) => ({
           sentence,
           index,
           key: `${memoryIdx}-${selectedMemory.id}-${index}`,
+          element: Array.from(sentenceElements).find(
+            element =>
+              Number(element.dataset.sentenceIndex) === index
+          ),
         }))
-        .filter(item => !changedSentences.has(item.key));
+        .filter(item => {
+          if (!item.sentence.variations?.length) return false;
+
+          if (changedSentences.has(item.key)) return false;
+
+          if (!item.element) return false;
+
+          // Exclude sentences the user is looking at
+          if (isLookingAtElement(item.element, currentGaze)) {
+            return false;
+          }
+
+          return true;
+        });
 
       if (candidates.length === 0) return;
 
-      // Select one random sentence
+      // Select a random sentence outside the user's gaze
       const selected =
         candidates[Math.floor(Math.random() * candidates.length)];
 
-      // Select one random variation
-      const variations = selected.sentence.variations;
-
-      if (!variations) return;
+      const variations = selected.sentence.variations!;
 
       const variation =
         variations[Math.floor(Math.random() * variations.length)];
@@ -274,7 +335,7 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick, setHistory
         },
       ]);
 
-      // Update only that sentence
+      // Update the sentence
       setTextMemories(previous => {
         const current = previous[memoryKey] ??
           originalMemory.sentences.map(s => s.original);
@@ -288,7 +349,7 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick, setHistory
         };
       });
 
-      // Remember that this sentence has changed
+      // Mark as changed
       setChangedSentences(previous =>
         new Set([...previous, selected.key])
       );
@@ -613,6 +674,7 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick, setHistory
       {selectedMemory && (
         <div
           className="memory-content"
+          ref={textMemoryContainerRef}
         >
           {selectedMemory.type === "image" && (
             <ImageMemory
