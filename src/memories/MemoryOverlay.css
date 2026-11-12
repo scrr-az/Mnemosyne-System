@@ -44,6 +44,8 @@
 
 .memory-overlay img {
   margin: auto;
+  max-height: 65%;
+  max-width: 60%;
 }
 
 .sentence-selectable {

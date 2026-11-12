@@ -23,16 +23,18 @@
 .memory-label {
   height: 36px;
   box-sizing: border-box;
-  padding-left: 4px;
-  background: #eee;
+  padding-left: 10px;
+  background: black;
 
-  font-size: 11px;
+  font-size: 14px;
+  color: white;
 
   display: flex;
   align-items: center;
 
   outline-style: solid;
   outline-width: 1px;
+  outline-color: black;
 }
 
 .memory-card img {

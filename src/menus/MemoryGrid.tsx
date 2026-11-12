@@ -19,9 +19,9 @@ const memories : MemoryItem[] = [
   { id: 4, src: "src/assets/mindefault.png", alt: "Memory 3", index: -1 },
   { id: 5, src: "src/assets/mindefault.png", alt: "Memory 3", index: -1 },
   { id: 6, src: "src/assets/mindefault.png", alt: "Memory 3", index: -1 },
-  { id: 7, src: "src/assets/mindefault.png", alt: "Memory 3", index: -1 },
-  { id: 8, src: "src/assets/min1.png", alt: "Memory 1", index: 1 },
-  { id: 9, src: "src/assets/min2.png", alt: "Memory 2", index: 0 },
+  { id: 7, src: "src/assets/minGrandma.png", alt: "Memory 7", index: 2 },
+  { id: 8, src: "src/assets/minLove.png", alt: "Memory 8", index: 1 },
+  { id: 9, src: "src/assets/minGraduation.png", alt: "Memory 9", index: 0 },
 ]
 
 const IMAGE_WIDTH = 340;

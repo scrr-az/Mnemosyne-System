@@ -44,7 +44,7 @@ const images_graduation: MemoryItem[] = [
     type: "image"
   },
   { id: 3, src: "src/assets/graduation/3.png", alt: "Image 3",
-    type: "image"
+    type: "text"
   },
   { id: 4, src: "src/assets/graduation/4.png", alt: "Image 4",
     type: "image"
@@ -73,28 +73,49 @@ const images_love: MemoryItem[] = [
     type: "image"
   },
   { id: 3, src: "src/assets/love/3.png", alt: "Image 3",
-    type: "text"
+    type: "image"
   },
   { id: 4, src: "src/assets/love/4.png", alt: "Image 4",
     type: "image"
   },
-  { id: 5, src: "src/assets/love/5.png", alt: "Image 5",
+  { id: 5, src: "src/assets/love/5.png", alt: "Image 4",
+    type: "text"
+  },
+  { id: 6, src: "src/assets/love/6.png", alt: "Image 4",
     type: "image"
   },
-  { id: 6, src: "src/assets/love/6.png", alt: "Image 6",
+  { id: 7, src: "src/assets/love/7.png", alt: "Image 4",
     type: "image"
-  },
-  { id: 7, src: "src/assets/love/7.png", alt: "Image 7",
-    type: "image"
-  },
-  { id: 8, src: "src/assets/love/8.png", alt: "Image 8",
-    type: "image"
-  },
+  }
 ];
+
+const images_grandma: MemoryItem[] = [
+  { id: 1, src: "src/assets/grandma/1.png", alt: "Image 1",
+    type: "image"
+  },
+  { id: 2, src: "src/assets/grandma/2.png", alt: "Image 2",
+    type: "image"
+  },
+  { id: 3, src: "src/assets/grandma/3.png", alt: "Image 3",
+    type: "image"
+  },
+  { id: 4, src: "src/assets/grandma/4.png", alt: "Image 4",
+    variations: ["src/assets/grandma/4-variation.png"],
+    type: "image"
+  },
+  { id: 5, src: "src/assets/grandma/5.png", alt: "Image 5",
+    type: "image"
+  },
+  { id: 6, src: "src/assets/grandma/6.png", alt: "Image 6",
+    variations: ["src/assets/grandma/6-variation.png"],
+    type: "image"
+  }
+]
 
 const memories: MemoryItem[][] = [
   images_graduation,
-  images_love
+  images_love,
+  images_grandma
 ];
 
 /* TEXT ITEMS */
@@ -110,8 +131,14 @@ type TextMemoryData = {
 
 // + 10 if it is the second set of memories (love)
 const textMemoryData: Record<number, TextMemoryData> = {
-  13: {
-    id: 13,
+  3: {
+    id: 3,
+    sentences: [
+      {original: "Well, congratulations! You've certainly earned it.\n\nYour thesis on the dinosaur fossils from Porto Dinheiro was impressive. Particularly your analysis of the vertebrae.\n\nI remember you coming into my office, convinced that some of those bones didn't belong to any species we'd identified before.\n\nI was skeptical at first. But you've made a convincing argument. Of course, we'll need more evidence before we can draw any conclusions.\n\nStill, it's remarkable work, especially for someone just starting their career.\n\nYou have something that can't really be taught. Patience. Curiosity. And that stubborn determination to find meaning in the smallest things.\n\nJust don't forget that there's more to life than your work.\n\nAnyway, you've made me very proud.\n\nI have a feeling this is only the beginning for you."}
+    ]
+  },
+  15: {
+    id: 15,
     sentences: [
       {original: "Hey you,\n\nI've been wanting to write this for a while, but I never really knew how to put it into words.\n\nI keep thinking about graduation night. You were wearing that "},
       {original: "dark blue dress", variations:["red satin dress"]},

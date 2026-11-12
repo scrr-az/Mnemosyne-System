@@ -17,6 +17,7 @@ type QuizItem = {
 
 // 1 to 10 is graduation
 // 11 to 20 is love
+// 21 to 30 is grandma
 const quizes: QuizItem[] = [
   {
     id: 1,
@@ -41,6 +42,18 @@ const quizes: QuizItem[] = [
     question: "What item was originally on the table?",
     answers: ["Plant", "Candle", "Nothing"],
     correctIdx: 2
+  },
+  {
+    id: 24,
+    question: "Who was originally shown in the photo?",
+    answers: ["Maria", "St. Antonio", "Teresinha"],
+    correctIdx: 0
+  },
+  {
+    id: 26,
+    question: "What amount was originally shown on the bill?",
+    answers: ["10 euros", "20 euros", "50 euros"],
+    correctIdx: 0
   },
 ];
 

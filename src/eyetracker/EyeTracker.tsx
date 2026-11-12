@@ -23,6 +23,28 @@ interface EyeTrackingContextType {
   stopTracking: () => void;
 }
 
+const hideWebGazerUI = () => {
+  webgazer.showVideoPreview(false);
+  webgazer.showFaceOverlay(false);
+  webgazer.showFaceFeedbackBox(false);
+  webgazer.showPredictionPoints(false);
+
+  // Hide WebGazer's visual elements
+  const selectors = [
+    "#webgazerVideoContainer",
+    "#webgazerFaceOverlay",
+    "#webgazerFaceFeedbackBox",
+    "#webgazerGazeDot",
+  ];
+
+  selectors.forEach((selector) => {
+    const element = document.querySelector(selector);
+    if (element instanceof HTMLElement) {
+      element.style.display = "none";
+    }
+  });
+};
+
 const EyeTrackingContext =
   createContext<EyeTrackingContextType | null>(null);
 
@@ -43,10 +65,7 @@ export function EyeTrackingProvider({
     startingRef.current = true;
 
     try {
-      webgazer.showVideoPreview(false);
-      webgazer.showFaceOverlay(false);
-      webgazer.showFaceFeedbackBox(false);
-      webgazer.showPredictionPoints(true);
+      hideWebGazerUI();
 
       webgazer.params.faceMeshSolutionPath =
         "https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh";
@@ -66,6 +85,8 @@ export function EyeTrackingProvider({
       }
 
       await webgazer.begin();
+
+      hideWebGazerUI();
 
       startedRef.current = true;
       setIsTracking(true);
@@ -122,21 +143,6 @@ export function EyeTrackingProvider({
       }}
     >
       {children}
-
-      <div
-        style={{
-          position: "fixed",
-          left: gaze?.x ?? -100,
-          top: gaze?.y ?? -100,
-          width: 18,
-          height: 18,
-          backgroundColor: "red",
-          borderRadius: "50%",
-          transform: "translate(-50%, -50%)",
-          pointerEvents: "none",
-          zIndex: 99999,
-        }}
-      />
     </EyeTrackingContext.Provider>
   );
 }
