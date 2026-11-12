@@ -415,6 +415,7 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick, setHistory
   }, [selectedMemory, memoryIdx, isActive, changedSentences]);
 
   function handleSetIntegrity (value: number) {
+    if (integrity + value > 100) return;
     setIntegrity((prevValue) => prevValue + value);
   }
 
@@ -662,7 +663,7 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick, setHistory
 
   return (
     <div
-      className="image-grid"
+      className = {isSelectingQuizMemory || isSelectingTextSentence ? "image-grid selection" : "image-grid"}
       style={{
         width: COLUMNS * CELL_WIDTH,
         height: ROWS * CELL_HEIGHT,
