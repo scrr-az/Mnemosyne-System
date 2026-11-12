@@ -247,6 +247,15 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick } : ImageGr
   const [isSelectingQuizMemory, setIsSelectingQuizMemory] = useState(false);
   const [quizMemory, setQuizMemory] = useState<number | null>(null);
 
+  function handleReportClick(){
+    if(selectedMemory){
+      setQuizMemory(selectedMemory.id + memoryIdx * 10);
+      return;
+    }
+    setQuizMemory(null);
+    setIsSelectingQuizMemory(true);
+  }
+
   function handleMemoryClick(image: PositionedImage) {
     if (isSelectingQuizMemory) {
       setQuizMemory(image.id + memoryIdx * 10);
@@ -255,6 +264,62 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick } : ImageGr
     }
     setSelectedMemory(image);
   }
+
+  function handleQuizAnswer(correct: boolean) {
+  if (!correct || quizMemory === null) return;
+
+  const memoryId = quizMemory % 10;
+  const memoryIndex = Math.floor(quizMemory / 10);
+
+  const memory = memories[memoryIndex]?.find(
+    item => item.id === memoryId
+  );
+
+  if (!memory) return;
+
+  // Reset image to original source
+  if (memory.type === "image") {
+    const sourceKey = `${memoryIndex}-${memoryId}`;
+
+    setDisplayedSources(previous => {
+      const updated = { ...previous };
+      delete updated[sourceKey];
+      return updated;
+    });
+
+    setChangedImages(previous => {
+      const updated = new Set(previous);
+      updated.delete(sourceKey);
+      return updated;
+    });
+  }
+
+  // Reset text to original sentences
+  if (memory.type === "text") {
+    const originalMemory = textMemoryData[quizMemory];
+
+    if (originalMemory) {
+      setTextMemories(previous => ({
+        ...previous,
+        [quizMemory]: originalMemory.sentences.map(
+          sentence => sentence.original
+        ),
+      }));
+
+      setChangedSentences(previous => {
+        const updated = new Set(previous);
+
+        originalMemory.sentences.forEach((_, index) => {
+          updated.delete(`${memoryIndex}-${memoryId}-${index}`);
+        });
+
+        return updated;
+      });
+    }
+  }
+
+  setQuizMemory(null);
+}
 
   // Function to change the images
   useEffect(() => {
@@ -341,10 +406,7 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick } : ImageGr
       {!quizMemory && (<Overlay
         onBackClick={onBackClick}
         selectedMemory={selectedMemory !== null}
-        onReportClick={() => {
-          setSelectedMemory(null);
-          setIsSelectingQuizMemory(true);
-        }}
+        onReportClick={handleReportClick}
       />)}
 
       {/* Dots */}
@@ -424,6 +486,7 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick } : ImageGr
         <ReportQuiz
           memory={quizMemory}
           onClose={() => setQuizMemory(null)}
+          onSubmitAnswer={handleQuizAnswer}
         />
       )}
     </div>
