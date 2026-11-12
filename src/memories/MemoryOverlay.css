@@ -22,6 +22,10 @@
   background-color: white;
   border: 1px solid black;
 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
   cursor: default;
 }
 
@@ -31,7 +35,14 @@
 }
 
 .back-button-memories {
-  padding: 5% 0% 0% 5%;
+  position: absolute;
+  top: 20%;
+  left: 23%;
+  z-index: 3;
+}
+
+.memory-overlay img {
+  margin: auto;
 }
 
 .sentence-selectable {
