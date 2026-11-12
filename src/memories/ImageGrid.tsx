@@ -110,16 +110,16 @@ const textMemoryData: Record<number, TextMemoryData> = {
     id: 2,
     sentences: [
       {original: "Hey you,\n\nI've been wanting to write this for a while, but I never really knew how to put it into words.\n\nI keep thinking about graduation night. You were wearing that "},
-      {original: "dark blue dress ", variations:["red satin dress "]},
-      {original: "(the one you said was a last-minute choice), and I had my "},
-      {original: "stupid black suit with the slightly crooked tie. ", variations:["elegant white suit with a perfectly straight tie. "]},
-      {original: "I still remember the little golden lights hanging above the dance floor and how cold it was outside compared to the crowded room.\n\nYou probably don't remember, but when we first started talking, you said, \""},
-      {original: "I don't usually dance, but I guess tonight is an exception.\" ", variations:["I was secretly hoping you'd ask me to dance tonight.\" "]},
-      {original: "I think about that sentence more often than I should.\n\nI remember us sitting by the "},
-      {original: "staircase, ", variations:["balcony doors, "]},
-      {original: "sharing a "},
-      {original: "glass of lemonade, ", variations:["glass of orangeade, "]},
-      {original: "while everyone else was taking pictures. You laughed at one of my terrible jokes, and honestly, I think that's when I started falling for you.\nIt's only been a few months, but somehow it feels like I've known you much longer.I don't want to make this complicated, so I'll just say it: I think I'm falling in love with you.And I hope you feel it too.\n\nYours,\nA."}
+      {original: "dark blue dress", variations:["red satin dress"]},
+      {original: " (the one you said was a last-minute choice), and I had my "},
+      {original: "stupid black suit with the slightly crooked tie", variations:["elegant white suit with a perfectly straight tie"]},
+      {original: ". I still remember the little golden lights hanging above the dance floor and how cold it was outside compared to the crowded room.\n\nYou probably don't remember, but when we first started talking, you said, \""},
+      {original: "I don't usually dance, but I guess tonight is an exception", variations:["I was secretly hoping you'd ask me to dance tonight"]},
+      {original: ".\" I think about that sentence more often than I should.\n\nI remember us sitting by the "},
+      {original: "staircase", variations:["balcony doors"]},
+      {original: ", sharing a "},
+      {original: "glass of lemonade", variations:["glass of orangeade"]},
+      {original: ", while everyone else was taking pictures. You laughed at one of my terrible jokes, and honestly, I think that's when I started falling for you.\nIt's only been a few months, but somehow it feels like I've known you much longer. I don't want to make this complicated, so I'll just say it: I think I'm falling in love with you. And I hope you feel it too.\n\nYours,\nA."}
     ]
   }
 }
@@ -188,7 +188,9 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick, setHistory
   const [changedSentences, setChangedSentences] = useState<Set<string>>(
     new Set()
   );
+  const [isSelectingTextSentence, setIsSelectingTextSentence] = useState(false);
 
+  const [integrity, setIntegrity] = useState<number>(100);
 
   // clear everything
   useEffect(() => {
@@ -210,11 +212,15 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick, setHistory
     setIsSelectingQuizMemory(false);
     setQuizMemory(null);
 
+    setIsSelectingTextSentence(false);
+
     // finished reseting
     setResetMemories(false);
+    setIntegrity(100);
 
   }, [resetMemories]);
 
+  // change sentence
   useEffect(() => {
     if (
       !selectedMemory ||
@@ -287,17 +293,32 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick, setHistory
         new Set([...previous, selected.key])
       );
 
+      handleSetIntegrity(-5);
+
     }, 5000);
 
     return () => clearInterval(interval);
 
   }, [selectedMemory, memoryIdx, isActive, changedSentences]);
 
-  function handleReportClick(){
-    if(selectedMemory){
+  function handleSetIntegrity (value: number) {
+    setIntegrity((prevValue) => prevValue + value);
+  }
+
+  function handleReportClick() {
+    if (selectedMemory) {
+
+      // Text memories require sentence selection
+      if (selectedMemory.type === "text") {
+        setIsSelectingTextSentence(true);
+        return;
+      }
+
+      // Image memories keep the existing quiz behavior
       setQuizMemory(selectedMemory.id + memoryIdx * 10);
       return;
     }
+
     setQuizMemory(null);
     setIsSelectingQuizMemory(true);
   }
@@ -309,6 +330,63 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick, setHistory
       return;
     }
     setSelectedMemory(image);
+  }
+
+  function handleTextSentenceReport(
+    index: number,
+    answer: string
+  ) {
+    if (!selectedMemory || selectedMemory.type !== "text") return;
+
+    const memoryKey = memoryIdx * 10 + selectedMemory.id;
+    const originalMemory = textMemoryData[memoryKey];
+
+    if (!originalMemory) return;
+
+    const originalSentence = originalMemory.sentences[index].original;
+
+    // Check whether the answer matches the original sentence
+    if (answer !== originalSentence) {
+      alert("Incorrect answer. The sentence has not been restored.");
+      return;
+    }
+
+    const sentenceKey = `${memoryIdx}-${selectedMemory.id}-${index}`;
+
+    // Restore the original sentence
+    setTextMemories(previous => {
+      const updated = [...previous[memoryKey]];
+      updated[index] = originalSentence;
+
+      return {
+        ...previous,
+        [memoryKey]: updated,
+      };
+    });
+
+    // Allow the sentence to be changed again in the future
+    setChangedSentences(previous => {
+      const updated = new Set(previous);
+      updated.delete(sentenceKey);
+      return updated;
+    });
+
+    // Mark the corresponding history entry as recovered
+    setHistory(previous =>
+      previous.map(entry =>
+        entry.memoryIdx === memoryIdx &&
+        entry.itemId === selectedMemory.id &&
+        entry.itemType === "text" &&
+        entry.fragmentIndex === index
+          ? { ...entry, recovered: true }
+          : entry
+      )
+    );
+
+    handleSetIntegrity(5);
+
+    // Exit sentence-selection mode
+    setIsSelectingTextSentence(false);
   }
 
   function handleQuizAnswer(correct: boolean) {
@@ -372,6 +450,8 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick, setHistory
           : entry
       )
     );
+
+    handleSetIntegrity(5);
 
     setQuizMemory(null);
   }
@@ -448,6 +528,8 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick, setHistory
       // Mark it as already changed
       setChangedImages(previous => new Set([...previous, sourceKey]));
 
+      handleSetIntegrity(-5);
+
     }, 5000);
 
     return () => clearInterval(interval);
@@ -477,6 +559,7 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick, setHistory
         onBackClick={onBackClick}
         selectedMemory={selectedMemory !== null}
         onReportClick={handleReportClick}
+        integrity={integrity}
       />)}
 
       {/* Dots */}
@@ -547,7 +630,13 @@ export default function ImageGrid({ isActive, memoryIdx, onBackClick, setHistory
               sentences={
                 textMemories[selectedMemory.id + memoryIdx * 10] ?? []
               }
-              onClose={() => setSelectedMemory(null)}
+              reportMode={isSelectingTextSentence}
+              onClose={() => {
+                setSelectedMemory(null);
+                setIsSelectingTextSentence(false);
+              }}
+              onCancelReport={() => setIsSelectingTextSentence(false)}
+              onSentenceReport={handleTextSentenceReport}
             />
           )}
         </div>

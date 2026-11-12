@@ -33,3 +33,38 @@
 .back-button-memories {
   padding: 5% 0% 0% 5%;
 }
+
+.sentence-selectable {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.sentence-selectable:hover {
+  background-color: rgba(255, 220, 100, 0.25);
+}
+
+.sentence-selected {
+  background-color: rgba(255, 200, 50, 0.4);
+  cursor: pointer;
+  outline: 1px dashed orange;
+}
+
+.sentence-report-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.sentence-report-form textarea {
+  width: 100%;
+  resize: vertical;
+  padding: 10px;
+  font-family: inherit;
+  font-size: inherit;
+  box-sizing: border-box;
+}
+
+.sentence-report-form button {
+  cursor: pointer;
+}

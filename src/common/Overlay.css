@@ -18,6 +18,7 @@
 
   pointer-events: auto;
 }
+
 .report-button {
   position: absolute;
   right: 100px;
@@ -25,4 +26,10 @@
   cursor: pointer;
 
   pointer-events: auto;
+}
+
+.integrity-info {
+  position: absolute;
+  left: 100px;
+  bottom: 50px;
 }
